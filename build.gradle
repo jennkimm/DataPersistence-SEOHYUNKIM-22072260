@@ -25,10 +25,15 @@ application {
     mainClass = 'com.ssemi.datapersistence.App'
 }
 
+run {
+    standardInput = System.in
+    jvmArgs '-Dfile.encoding=UTF-8', '-Dstdout.encoding=UTF-8', '-Dstderr.encoding=UTF-8'
+}
+
 test {
     useJUnitPlatform()
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }

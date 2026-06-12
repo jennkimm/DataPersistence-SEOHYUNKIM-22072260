@@ -46,4 +46,64 @@ class SampleServiceTest {
         assertThrows(IllegalArgumentException.class,
                 () -> service.create(new Sample("S001", "시료B", 30, 0.90, 50)));
     }
+
+    @Test
+    void findById_존재하는ID이면_Optional로_반환한다() throws IOException {
+        service.create(new Sample("S002", "시료B", 45, 0.88, 200));
+
+        Optional<Sample> found = service.findById("S002");
+
+        assertTrue(found.isPresent());
+        assertEquals("시료B", found.get().getName());
+    }
+
+    @Test
+    void findById_존재하지않는ID이면_빈_Optional을_반환한다() throws IOException {
+        Optional<Sample> found = service.findById("NONE");
+
+        assertTrue(found.isEmpty());
+    }
+
+    @Test
+    void findAll_여러건_저장후_전체를_반환한다() throws IOException {
+        service.create(new Sample("S010", "시료X", 30, 0.90, 50));
+        service.create(new Sample("S011", "시료Y", 60, 0.85, 80));
+
+        List<Sample> all = service.findAll();
+
+        assertEquals(2, all.size());
+    }
+
+    @Test
+    void update_존재하는ID이면_필드가_수정된다() throws IOException {
+        service.create(new Sample("S003", "시료C", 60, 0.90, 100));
+
+        service.update("S003", new Sample("S003", "수정된시료C", 90, 0.85, 150));
+
+        Sample found = service.findById("S003").orElseThrow();
+        assertEquals("수정된시료C", found.getName());
+        assertEquals(150, found.getInventory());
+    }
+
+    @Test
+    void update_존재하지않는ID이면_예외를_던진다() {
+        assertThrows(IllegalArgumentException.class,
+                () -> service.update("NONE",
+                        new Sample("NONE", "없는시료", 60, 0.9, 0)));
+    }
+
+    @Test
+    void delete_존재하는ID이면_목록에서_제거된다() throws IOException {
+        service.create(new Sample("S004", "시료D", 30, 0.92, 50));
+
+        service.delete("S004");
+
+        assertTrue(service.findById("S004").isEmpty());
+    }
+
+    @Test
+    void delete_존재하지않는ID이면_예외를_던진다() {
+        assertThrows(IllegalArgumentException.class,
+                () -> service.delete("NONE"));
+    }
 }
